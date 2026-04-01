@@ -1,0 +1,9 @@
+1. When you use notify() instead of notifyAll(), you are notifying one thread to awaken after it has used wait(). In our lab, since we are not using multiple threads at once, notify() works fine however, should there be multiple threads like consumer threads, only one of them will be opened due to notify() only notifying one consumer thread's wait(). Unless you make a loop of notify methods to which would be redundant, it is better to just use notifyAll().
+
+2. Without the while loop, two problems can occur. The first one being that thread can wake up without being notified and the second one being that other threads could be waiting to be notified. The while loop ensures that should it wake up, it would still be within its loop, thus reapplying wait().
+
+3. If the produce() method was not synchronized, the code fails due to it trying to run a method a which it is not the owner of. Once the synchronized consume() method is running, it locks other threads from having access to the buffer. Since produce() is no longer synchronized, it tries to access the buffer without waiting for consume() to unlock, causing an error. If there were two produce() threads running and we exclude the synchronize consume(), there would be a race condition as the two unsynchronized threads simultaneously add overlapping values into the buffer.
+
+4. If you forget to call notifyAll() in the produce method, the consumer will finish consuming the first 5 items, wait for the producer to notify that the buffer has been refilled and be sleeping forever.
+
+5.The reason why wait() releases the lock is so that it can allow other threads to access the object and then notify the waited thread that it can compete for the object. If it did not release the lock, the other threads would have to notify the thread to release the lock which would have both threads having the moment to access the object.
